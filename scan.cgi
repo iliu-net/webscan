@@ -122,9 +122,14 @@ gen_pdf() {
 }
 
 download_pdf() {
+    #echo 'Content-type: text/plain'
+    #echo ''
+    #exec 2>&1
+
   local session="$1" output="$scanqueue/$1/scan-$(date +%Y-%m-%d_%H%M).pdf"
   gen_pdf "$session" "$output"
-  echo Location: "/$output"
+  echo Location: "$output"
+  echo ''
 }
 
 post_pdf() {
