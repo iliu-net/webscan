@@ -122,11 +122,12 @@ gen_pdf() {
 }
 
 download_pdf() {
-    #echo 'Content-type: text/plain'
-    #echo ''
-    #exec 2>&1
+  #echo 'Content-type: text/plain'
+  #echo ''
+  #exec 2>&1
 
-  local session="$1" output="$scanqueue/$1/scan-$(date +%Y-%m-%d_%H%M).pdf"
+  local session="$1"
+  local output="$scanqueue/$session/scan-$(date +%Y-%m-%d_%H%M -r $scanqueue/$session/scan.txt).pdf"
   gen_pdf "$session" "$output"
   echo Location: "$output"
   echo ''
@@ -136,19 +137,30 @@ post_pdf() {
   #echo 'Content-type: text/plain'
   #echo ''
   #exec 2>&1
-  local session="$1" output="$scanqueue/$1/scan-$(date +%Y-%m-%d_%H%M).pdf"
+  local session="$1"
+  local output="$scanqueue/$session/scan-$(date +%Y-%m-%d_%H%M -r $scanqueue/$session/scan.txt).pdf"
   gen_pdf "$session" "$output"
   local posturl="$(cat $scanqueue/$session/posturl.txt)"
 
-  local next_url=$(curl -s "$posturl" \
+  local post_data="$(curl "$posturl" \
 	-F uploadFile=@"$output;type=application/pdf;filename=$(basename $output)" \
-	-F create=scanned \
-	| grep NEXT-URL: | cut -d: -f2-)
-
-  echo "Refresh: 0;url=$(echo $posturl | cut -d/ -f-3)$next_url"
-  echo "Content-type: text/html"
-  echo ''
-  echo "<a href=\"$(echo $posturl | cut -d/ -f-3)$next_url\">Created record</a>"
+	-F create=scanned 2>/dev/null)"
+  if (echo "$post_data" | grep -q NEXT-URL:) ; then
+    local next_url="$(echo "$post_data" | grep NEXT-URL: | cut -d: -f2-)"
+    echo "Refresh: 5;url=$(echo $posturl | cut -d/ -f-3)$next_url"
+    echo "Content-type: text/html"
+    echo ''
+    echo "<a href=\"$(echo $posturl | cut -d/ -f-3)$next_url\">Created record</a>"
+  else
+    echo 'Content-type: text/html'
+    echo ''
+    echo '<h1>Error></h1>'
+    local myurl="$SCRIPT_NAME"'?'"session=$session"
+    %>
+      <a href="<%= $myurl %>&cmd=preview">Back to preview</a> :
+    <%
+    echo "$post_data"
+  fi
 
 }
 
