@@ -192,6 +192,7 @@ scan_page() {
     msgr=$(readlink -f lib/msg-filter.sh)
     cd "$scanqueue/$session"
     exec > log.txt 2>&1
+    > msgs.txt
     sh "$msgr" \
 	status.txt \
 	msgs.txt \
