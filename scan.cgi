@@ -3,7 +3,7 @@
 set -euf
 scanqueue="scan.d"
 
-./lib/scand-cleanup.sh "$scanqueue"
+./lib/scand-cleanup.sh "$scanqueue"/.
 
 header() {
   local title="$1"
@@ -73,7 +73,7 @@ begin_wf() {
   </p>
   <p>
     <label for="res">Resolution (DPI): </label>
-    <input type="text" name="res" id="res" value="<%= ${FORM_res:-100} %>"/>
+    <input type="text" name="res" id="res" value="<%= ${FORM_res:-300} %>"/>
   </p>
   <p>
     <label for="comp">Compression: </label>
