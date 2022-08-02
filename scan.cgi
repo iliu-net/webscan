@@ -3,7 +3,7 @@
 set -euf
 scanqueue="scan.d"
 
-./lib/scand-cleanup.sh "$scanqueue"/.
+./lib/scand-cleanup.sh "$scanqueue"/. || :
 
 header() {
   local title="$1"
@@ -69,7 +69,9 @@ begin_wf() {
 <form method="POST">
   <p>
     <label for="mode">Mode: </label>
-    <% fm_select mode -d color gray color lineart %>
+    <!-- Disabling lineart mode as it doesn't seem to work! -->
+    <!-- fm_select mode -d color gray color lineart -->
+    <% fm_select mode -d color gray color %>
   </p>
   <p>
     <label for="res">Resolution (DPI): </label>
@@ -207,6 +209,7 @@ preview_pages() {
   local session="$1"
   local myurl="$SCRIPT_NAME"'?'"session=$session"
   %>
+  <a href="<%= $SCRIPT_NAME %>">New scan job</a> :
   <a href="<%= $myurl %>&cmd=scanpg">Add Page</a> :
   <%
     if [ -f "$scanqueue/$session/posturl.txt" ] ; then

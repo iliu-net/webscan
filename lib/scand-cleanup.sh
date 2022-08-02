@@ -18,4 +18,5 @@ do
     rm -rf "$fn"
   fi
 done
+:
 
